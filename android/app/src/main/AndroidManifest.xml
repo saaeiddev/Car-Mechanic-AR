@@ -1,7 +1,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-feature android:name="android.hardware.camera.any" android:required="true" />
     <application android:theme="@style/AppTheme" android:label="مکانیک AR" android:allowBackup="false" android:supportsRtl="true">
+        <activity android:name=".AboutActivity" android:screenOrientation="portrait" android:exported="false" />
+        <activity android:name=".ModelViewerActivity" android:screenOrientation="portrait" android:exported="false" />
+        <activity android:name=".GalleryAnalysisActivity" android:screenOrientation="portrait" android:exported="false" />
+        <activity android:name=".SettingsActivity" android:screenOrientation="portrait" android:exported="false" />
+        <activity android:name=".QuizActivity" android:screenOrientation="portrait" android:exported="false" />
+        <activity android:name=".PartListActivity" android:screenOrientation="portrait" android:exported="false" />
+        <activity android:name=".PartDetailActivity" android:screenOrientation="portrait" android:exported="false" />
         <activity android:name=".MainActivity" android:screenOrientation="portrait" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

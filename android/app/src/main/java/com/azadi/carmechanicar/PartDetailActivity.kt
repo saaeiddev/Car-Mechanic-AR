@@ -1,0 +1,11 @@
+package com.azadi.carmechanicar
+import android.app.Activity
+import android.content.Intent
+import android.graphics.Color
+import android.os.Bundle
+import android.view.ViewGroup
+import android.widget.*
+import com.azadi.carmechanicar.data.PartRepository
+import com.azadi.carmechanicar.storage.AppStorage
+import com.azadi.carmechanicar.util.Ui
+class PartDetailActivity:Activity(){override fun onCreate(savedInstanceState:Bundle?){super.onCreate(savedInstanceState);window.statusBarColor=Color.rgb(5,9,13);val p=PartRepository.byId(intent.getStringExtra("partId")?:"");val storage=AppStorage(this);val scroll=ScrollView(this);val root=LinearLayout(this).apply{orientation=LinearLayout.VERTICAL;setPadding(Ui.dp(context,16),Ui.dp(context,18),Ui.dp(context,16),Ui.dp(context,30));setBackgroundColor(Color.rgb(5,9,13))};scroll.addView(root);if(p==null){root.addView(Ui.title(this,"قطعه پیدا نشد"));setContentView(scroll);return};root.addView(Ui.title(this,p.nameFa,28f));root.addView(Ui.body(this,p.nameEn,15f,Color.rgb(160,210,220)));fun sec(t:String,b:String,c:Int=Color.rgb(41,213,255)){val v=LinearLayout(this).apply{orientation=LinearLayout.VERTICAL;setPadding(Ui.dp(context,14),Ui.dp(context,14),Ui.dp(context,14),Ui.dp(context,14));background=Ui.rounded(context,Color.argb(210,7,20,29),Color.rgb(41,213,255),1,18);addView(Ui.title(context,t,18f).apply{setTextColor(c)});addView(Ui.body(context,b))};root.addView(v,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=Ui.dp(this@PartDetailActivity,10)})};sec("معرفی",p.fullDescription);sec("وظیفه",p.function);sec("محل قرارگیری",p.location);if(p.commonSymptoms.isNotEmpty())sec("نشانه‌های خرابی",p.commonSymptoms.joinToString("\n"){"• $it"});if(p.maintenanceTips.isNotEmpty())sec("نگهداری",p.maintenanceTips.joinToString("\n"){"• $it"});p.safetyWarning?.let{sec("ایمنی",it,Color.rgb(255,150,90))};root.addView(Ui.primaryButton(this,if(storage.isFavorite(p.id))"حذف از علاقه‌مندی‌ها" else "افزودن به علاقه‌مندی‌ها"){if(storage.isFavorite(p.id))storage.removeFavorite(p.id)else storage.addFavorite(p.id);recreate()},ViewGroup.LayoutParams(-1,-2));root.addView(Ui.primaryButton(this,"مشاهده سه‌بعدی"){startActivity(Intent(this,ModelViewerActivity::class.java).putExtra("partId",p.id))},ViewGroup.LayoutParams(-1,-2));root.addView(Ui.primaryButton(this,"بازگشت"){finish()},ViewGroup.LayoutParams(-1,-2));setContentView(scroll)}}

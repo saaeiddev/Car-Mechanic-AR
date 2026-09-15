@@ -1,0 +1,12 @@
+package com.azadi.carmechanicar
+import android.app.Activity
+import android.content.Intent
+import android.graphics.Color
+import android.os.Bundle
+import android.text.*
+import android.widget.*
+import com.azadi.carmechanicar.data.PartRepository
+import com.azadi.carmechanicar.model.CarPart
+import com.azadi.carmechanicar.storage.AppStorage
+import com.azadi.carmechanicar.util.Ui
+class PartListActivity:Activity(){override fun onCreate(savedInstanceState:Bundle?){super.onCreate(savedInstanceState);val mode=intent.getStringExtra("mode")?:"learning";val storage=AppStorage(this);val root=LinearLayout(this).apply{orientation=LinearLayout.VERTICAL;setPadding(Ui.dp(context,16),Ui.dp(context,16),Ui.dp(context,16),Ui.dp(context,16));setBackgroundColor(Color.rgb(5,9,13))};root.addView(Ui.title(this,when(mode){"favorites"->"علاقه‌مندی‌ها";"history"->"تاریخچه";else->"آموزش قطعات"},24f));val search=EditText(this).apply{hint="جستجوی قطعه";setTextColor(Color.WHITE);setHintTextColor(Color.GRAY)};root.addView(search);val scroll=ScrollView(this);val list=LinearLayout(this).apply{orientation=LinearLayout.VERTICAL};scroll.addView(list);root.addView(scroll,LinearLayout.LayoutParams(-1,0,1f));fun source():List<CarPart>=when(mode){"favorites"->PartRepository.parts.filter{storage.favorites().contains(it.id)};"history"->storage.history().mapNotNull{PartRepository.byId(it)}.distinctBy{it.id};else->PartRepository.parts};fun render(items:List<CarPart>){list.removeAllViews();items.forEach{p->val card=LinearLayout(this).apply{orientation=LinearLayout.VERTICAL;setPadding(Ui.dp(context,12),Ui.dp(context,12),Ui.dp(context,12),Ui.dp(context,12));background=Ui.rounded(context,Color.argb(210,7,20,29),Color.rgb(41,213,255),1,16);addView(Ui.title(context,p.nameFa,18f));addView(Ui.body(context,"${p.nameEn} • ${p.category}",13f,Color.LTGRAY));addView(Ui.body(context,p.shortDescription,14f));setOnClickListener{startActivity(Intent(this@PartListActivity,PartDetailActivity::class.java).putExtra("partId",p.id))}};list.addView(card,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=Ui.dp(this@PartListActivity,8)})}};render(source());search.addTextChangedListener(object:TextWatcher{override fun beforeTextChanged(s:CharSequence?,st:Int,c:Int,a:Int){};override fun onTextChanged(s:CharSequence?,st:Int,b:Int,c:Int){};override fun afterTextChanged(s:Editable?){val q=s.toString();render(source().filter{it.nameFa.contains(q)||it.nameEn.contains(q,true)||it.category.contains(q)})}});root.addView(Ui.primaryButton(this,"بازگشت"){finish()});setContentView(root)}}

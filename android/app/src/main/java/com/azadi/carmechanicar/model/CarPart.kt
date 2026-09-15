@@ -6,9 +6,13 @@ data class CarPart(
     val nameEn: String,
     val category: String,
     val shortDescription: String,
+    val fullDescription: String,
     val function: String,
     val location: String,
-    val safetyWarning: String? = null
+    val commonSymptoms: List<String> = emptyList(),
+    val maintenanceTips: List<String> = emptyList(),
+    val safetyWarning: String? = null,
+    val relatedParts: List<String> = emptyList()
 )
 
 data class DetectedCarPart(

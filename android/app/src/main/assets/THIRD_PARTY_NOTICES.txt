@@ -1,0 +1,11 @@
+Car Mechanic AR — Third Party AI Model Notice
+
+AI model: AswinG5/moto-parts-30cls
+Source: https://huggingface.co/AswinG5/moto-parts-30cls
+License declared by model repository: MIT
+Task: image classification of 30 motorcycle / mechanical part classes.
+
+The APK build workflow downloads the published model weights and exports them to ONNX.
+The application performs inference on-device using ONNX Runtime Android.
+
+This model is a classifier, not a spatial detector. The cyan center box in mechanical-part mode is a focus guide; the predicted class and confidence come from the model.
