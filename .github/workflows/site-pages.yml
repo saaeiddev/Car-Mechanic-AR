@@ -1,95 +1,50 @@
-name: Car Mechanic AR Website
+name: Car Mechanic AR Web App
 
 on:
   push:
     branches: [ main ]
     paths:
       - 'site/**'
-      - 'android/**'
-      - 'scripts/prepare_real_ai_model.py'
+      - 'scripts/prepare_web_ai_model.py'
       - '.github/workflows/site-pages.yml'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
   pages: write
   id-token: write
 
 concurrency:
-  group: car-mechanic-pages
+  group: pages
   cancel-in-progress: true
 
 jobs:
   build-site:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 25
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
       - name: Install model export tools
         run: python -m pip install --upgrade pip && pip install "ultralytics>=8.3,<9" "huggingface_hub>=0.28" "onnx>=1.17,<2"
-
-      - name: Prepare real AI model
-        run: python scripts/prepare_real_ai_model.py
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-
-      - name: Set up Gradle 8.9
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.9'
-
-      - name: Build downloadable Android APK
-        working-directory: android
-        run: gradle --no-daemon assembleDebug
-
-      - name: Package APK inside website
+      - name: Prepare browser AI model
+        run: python scripts/prepare_web_ai_model.py
+      - name: Verify web app model
         run: |
-          mkdir -p site/downloads
-          cp android/app/build/outputs/apk/debug/app-debug.apk site/downloads/CarMechanicAR-RealAI.apk
-          touch site/.nojekyll
-          printf '{"commit":"%s","builtAt":"%s","file":"downloads/CarMechanicAR-RealAI.apk"}\n' "$GITHUB_SHA" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > site/build-info.json
-          test -s site/downloads/CarMechanicAR-RealAI.apk
-
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: CarMechanicAR-Website-APK
-          path: site/downloads/CarMechanicAR-RealAI.apk
-          if-no-files-found: error
-          retention-days: 30
-
-      - name: Publish fallback gh-pages branch
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          rm -rf /tmp/carmechanic-pages
-          cp -a site /tmp/carmechanic-pages
-          cd /tmp/carmechanic-pages
-          git init
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -b gh-pages
-          git add -A
-          git commit -m "Deploy Car Mechanic AR website"
-          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git push --force origin gh-pages
-
-      - name: Upload GitHub Pages artifact
-        uses: actions/upload-pages-artifact@v4
+          test -s site/models/car_parts_classifier.onnx
+          test -s site/models/car_part_labels.txt
+          ls -lh site/models/car_parts_classifier.onnx
+          wc -l site/models/car_part_labels.txt
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
           path: site
-
   deploy-pages:
     needs: build-site
     runs-on: ubuntu-latest
@@ -99,4 +54,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v5
+        uses: actions/deploy-pages@v4
