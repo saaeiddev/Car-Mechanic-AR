@@ -1,8 +1,8 @@
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js';
+import * as THREE from './vendor/three/three.module.js';
 
 const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => [...root.querySelectorAll(s)];
-const MODEL_URL = 'models/car_parts_classifier.onnx';
+const MODEL_URL = new URL('./models/car_parts_classifier.onnx', import.meta.url).href;
 const INPUT_SIZE = 224;
 const IMAGENET_MEAN = [0.485, 0.456, 0.406];
 const IMAGENET_STD = [0.229, 0.224, 0.225];
@@ -61,12 +61,35 @@ $$('[data-route]').forEach(b=>b.addEventListener('click',()=>routeTo(b.dataset.r
 async function loadModel(){
   try{
     setStatus('در حال بارگذاری مدل واقعی AI…');
-    ort.env.wasm.numThreads = Math.min(4, navigator.hardwareConcurrency || 2);
-    ort.env.wasm.simd = true;
-    state.session = await ort.InferenceSession.create(MODEL_URL,{executionProviders:['wasm'],graphOptimizationLevel:'all'});
+    if(!window.ort) throw new Error('ONNX Runtime Web is not available');
+
+    // GitHub Pages does not provide the cross-origin isolation headers required
+    // for SharedArrayBuffer. Using more than one WASM thread therefore breaks
+    // on iPhone/Safari and a number of mobile Chromium builds. Force a
+    // single-threaded local WASM runtime for maximum compatibility.
+    ort.env.wasm.numThreads = 1;
+    ort.env.wasm.proxy = false;
+    ort.env.wasm.wasmPaths = new URL('./vendor/ort/', import.meta.url).href;
+
+    // Fetch the model explicitly so a missing/cached HTML response is caught
+    // before ONNX Runtime tries to parse it as protobuf.
+    const response = await fetch(MODEL_URL,{cache:'no-store'});
+    if(!response.ok) throw new Error(`Model HTTP ${response.status}`);
+    const modelBytes = new Uint8Array(await response.arrayBuffer());
+    if(modelBytes.byteLength < 1024) throw new Error('Model file is unexpectedly small');
+
+    state.session = await ort.InferenceSession.create(modelBytes,{
+      executionProviders:['wasm'],
+      graphOptimizationLevel:'all'
+    });
     setStatus('مدل AI آماده است','ready');
     toast('مدل هوش مصنوعی آماده شد');
-  }catch(err){console.error(err);setStatus('خطا در بارگذاری مدل AI','error');toast('مدل AI بارگذاری نشد؛ اتصال اینترنت را بررسی کن')}
+  }catch(err){
+    console.error('AI model load failed:',err);
+    state.session=null;
+    setStatus('خطا در بارگذاری مدل AI','error');
+    toast('مدل AI بارگذاری نشد؛ صفحه را یک‌بار تازه‌سازی کن');
+  }
 }
 
 async function startCamera(){
@@ -116,7 +139,7 @@ $('#startQuizBtn').onclick=startQuiz;$('#restartQuizBtn').onclick=startQuiz;
 $('#thresholdRange').value=state.threshold;$('#thresholdValue').textContent=`${state.threshold}%`;$('#scanSpeed').value=String(state.scanSpeed);$('#hapticToggle').checked=state.haptics;$('#historyToggle').checked=state.keepHistory;$('#thresholdRange').oninput=e=>{$('#thresholdValue').textContent=`${e.target.value}%`;state.threshold=Number(e.target.value);localStorage.setItem('threshold',state.threshold)};$('#scanSpeed').onchange=e=>{state.scanSpeed=Number(e.target.value);localStorage.setItem('scanSpeed',state.scanSpeed)};$('#hapticToggle').onchange=e=>{state.haptics=e.target.checked;localStorage.setItem('haptics',state.haptics)};$('#historyToggle').onchange=e=>{state.keepHistory=e.target.checked;localStorage.setItem('keepHistory',state.keepHistory)};
 
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();state.deferredInstall=e;$('#installBtn').hidden=false});async function installPWA(){if(!state.deferredInstall){toast('از منوی مرورگر گزینه Add to Home Screen را انتخاب کن');return}state.deferredInstall.prompt();await state.deferredInstall.userChoice;state.deferredInstall=null;$('#installBtn').hidden=true}$('#installBtn').onclick=installPWA;$('#installSettingsBtn').onclick=installPWA;
-if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(console.warn));
+if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js?v=3',{updateViaCache:'none'}).catch(console.warn));
 
 let scene,camera3d,renderer,mechanicalGroup,animId;
 function init3D(){const canvas=$('#threeCanvas');scene=new THREE.Scene();camera3d=new THREE.PerspectiveCamera(42,1,.1,100);camera3d.position.set(3.2,2.4,4.4);renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));const a=new THREE.AmbientLight(0xbbefff,1.4);const key=new THREE.DirectionalLight(0x55ddff,3);key.position.set(4,5,5);const warm=new THREE.PointLight(0xff8a3d,8,12);warm.position.set(-3,1,2);scene.add(a,key,warm);mechanicalGroup=new THREE.Group();scene.add(mechanicalGroup);update3D('crankshaft');const ro=new ResizeObserver(()=>{const r=canvas.parentElement.getBoundingClientRect();renderer.setSize(r.width,r.height,false);camera3d.aspect=r.width/r.height;camera3d.updateProjectionMatrix()});ro.observe(canvas.parentElement);const animate=()=>{animId=requestAnimationFrame(animate);mechanicalGroup.rotation.y+=.006;mechanicalGroup.rotation.x=Math.sin(performance.now()/2500)*.08;renderer.render(scene,camera3d)};animate()}
