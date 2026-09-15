@@ -23,8 +23,8 @@ struct ModelViewerRepresentable: UIViewRepresentable {
         let view = ARView(frame: .zero, cameraMode: .nonAR, automaticallyConfigureSession: false)
         view.environment.background = .color(.init(white: 0.035, alpha: 1))
         let anchor = AnchorEntity(world: .zero)
-        let entity: Entity
-        if let url = Bundle.main.url(forResource: modelName.replacingOccurrences(of: ".usdz", with: ""), withExtension: "usdz"), let loaded = try? Entity.load(contentsOf: url) {
+        let entity: ModelEntity
+        if let url = Bundle.main.url(forResource: modelName.replacingOccurrences(of: ".usdz", with: ""), withExtension: "usdz"), let loaded = try? ModelEntity.loadModel(contentsOf: url) {
             entity = loaded
         } else {
             let material = SimpleMaterial(color: .cyan.withAlphaComponent(0.72), isMetallic: true)
@@ -34,7 +34,7 @@ struct ModelViewerRepresentable: UIViewRepresentable {
         anchor.addChild(entity)
         view.scene.addAnchor(anchor)
         view.installGestures([.rotation, .scale, .translation], for: entity)
-        var camera = PerspectiveCamera()
+        let camera = PerspectiveCamera()
         camera.position = [0, 0.05, 0.65]
         let camAnchor = AnchorEntity(world: .zero)
         camAnchor.addChild(camera)
