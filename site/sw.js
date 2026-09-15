@@ -1,5 +1,5 @@
-const CACHE='car-mechanic-ar-web-v6';
-const CORE=['./','./index.html','./styles.css','./app.js?v=6','./camera-patch.js?v=6','./manifest.webmanifest','./icon.svg'];
+const CACHE='car-mechanic-ar-web-v7';
+const CORE=['./','./index.html','./styles.css','./app.js?v=7','./camera-patch.js?v=7','./manifest.webmanifest','./icon.svg'];
 
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting()));
@@ -33,13 +33,8 @@ self.addEventListener('fetch',event=>{
   event.respondWith((async()=>{
     try{
       const response=await fetch(event.request,{cache:'no-store'});
-      if(response.ok){
-        const copy=response.clone();
-        caches.open(CACHE).then(cache=>cache.put(event.request,copy)).catch(()=>{});
-      }
+      if(response.ok){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(event.request,copy)).catch(()=>{});}
       return response;
-    }catch(_){
-      return (await caches.match(event.request)) || (await caches.match('./index.html'));
-    }
+    }catch(_){return (await caches.match(event.request)) || (await caches.match('./index.html'));}
   })());
 });
