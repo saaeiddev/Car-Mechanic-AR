@@ -68,7 +68,7 @@
                 <div class="gear g1">⚙</div><div class="gear g2">⚙</div><div class="piston p1"></div><div class="piston p2"></div>
               </div>
               <h1>مکانیک خودرو با هوش مصنوعی</h1>
-              <p>دوربین را فعال کن و یک قطعه مکانیکی را در مرکز کادر قرار بده.</p>
+              <p>برای دقت بهتر، یک قطعه را نزدیک دوربین و جدا از پس‌زمینه در مرکز کادر بگیر.</p>
               <button id="startCameraHero" class="primary-btn big">شروع اسکن</button>
             </div>
             <div class="prediction-chip" id="predictionChip" hidden>
@@ -88,15 +88,15 @@
 
         <aside class="result-panel glass">
           <div class="result-head">
-            <span class="eyebrow">LIVE DIAGNOSTIC VIEW</span>
-            <h2 id="resultFa">هنوز قطعه‌ای شناسایی نشده</h2>
-            <p id="resultEn">Waiting for camera input</p>
+            <span class="eyebrow">FINAL AI RESULT</span>
+            <h2 id="resultFa">هنوز نتیجه نهایی ثبت نشده</h2>
+            <p id="resultEn">Hold one part steady in the focus area</p>
           </div>
           <div class="part-visual" id="partVisual">
             <canvas id="threeCanvas"></canvas>
             <span class="visual-caption">نمای سه‌بعدی آموزشی</span>
           </div>
-          <p class="result-description" id="resultDescription">برای شروع، دوربین را فعال کن یا یک تصویر از قطعه بارگذاری کن.</p>
+          <p class="result-description" id="resultDescription">اسکنر چند فریم پشت سر هم را بررسی می‌کند و فقط وقتی نتیجه پایدار باشد آن را نهایی می‌کند.</p>
           <div class="result-grid">
             <div><span>وظیفه</span><strong id="resultFunction">—</strong></div>
             <div><span>محل</span><strong id="resultLocation">—</strong></div>
@@ -106,7 +106,7 @@
             <button id="favoriteCurrentBtn" class="ghost-btn" disabled>☆ افزودن به علاقه‌مندی‌ها</button>
             <button id="openDetailBtn" class="primary-btn" disabled>اطلاعات بیشتر</button>
           </div>
-          <p class="ai-note">مدل فعلی Classification است؛ کادر وسط راهنمای فوکوس است و Bounding Box واقعی نیست.</p>
+          <p class="ai-note">مدل فعلی Classification است؛ برای نتیجه قابل اعتماد خود قطعه باید واضح و نزدیک مرکز کادر باشد. این نسخه برای اشیای کوچکِ پنهان در یک نمای کامل موتور، Object Detection واقعی انجام نمی‌دهد.</p>
         </aside>
       </div>
     </section>
@@ -163,7 +163,7 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script src="vendor/ort/ort.min.js?v=6"></script>
+  <script src="vendor/ort/ort.min.js?v=7"></script>
   <script>
     if (window.ort) {
       ort.env.wasm.numThreads = 1;
@@ -171,7 +171,7 @@
       ort.env.wasm.wasmPaths = new URL('vendor/ort/', document.baseURI).href;
     }
   </script>
-  <script src="camera-patch.js?v=6"></script>
-  <script type="module" src="app.js?v=6"></script>
+  <script src="camera-patch.js?v=7"></script>
+  <script type="module" src="app.js?v=7"></script>
 </body>
 </html>
