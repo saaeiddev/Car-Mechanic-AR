@@ -3,141 +3,168 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#070b0f" />
-  <meta name="description" content="Car Mechanic AR - اپلیکیشن آموزش مکانیک خودرو و تشخیص قطعات با دوربین و هوش مصنوعی روی دستگاه." />
-  <title>Car Mechanic AR — مکانیک با واقعیت افزوده</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <meta name="theme-color" content="#081014" />
+  <meta name="description" content="Car Mechanic AR Web App — شناسایی و آموزش قطعات خودرو با دوربین و هوش مصنوعی روی مرورگر" />
+  <title>Car Mechanic AR — Web App</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="noise" aria-hidden="true"></div>
-  <header class="nav-wrap">
-    <nav class="nav container" aria-label="ناوبری اصلی">
-      <a class="brand" href="#top" aria-label="Car Mechanic AR">
-        <span class="brand-mark" aria-hidden="true"><span class="gear-dot"></span></span>
-        <span><strong>Car Mechanic AR</strong><small>مکانیک با واقعیت افزوده</small></span>
-      </a>
-      <button class="menu-btn" aria-label="باز کردن منو" aria-expanded="false">☰</button>
-      <div class="nav-links">
-        <a href="#features">قابلیت‌ها</a>
-        <a href="#how">نحوه کار</a>
-        <a href="#ai">هوش مصنوعی</a>
-        <a class="nav-download" href="downloads/CarMechanicAR-RealAI.apk" download>دانلود APK</a>
-      </div>
+  <header class="topbar glass">
+    <a class="brand" href="#scanner" aria-label="Car Mechanic AR">
+      <span class="brand-mark">⚙</span>
+      <span><strong>CAR MECHANIC AR</strong><small>WEB APP • REAL AI</small></span>
+    </a>
+    <nav class="desktop-nav" aria-label="ناوبری اصلی">
+      <button data-route="scanner">اسکنر</button>
+      <button data-route="learn">آموزش</button>
+      <button data-route="quiz">آزمون</button>
+      <button data-route="history">تاریخچه</button>
+      <button data-route="favorites">علاقه‌مندی‌ها</button>
+      <button data-route="settings">تنظیمات</button>
     </nav>
+    <div class="top-actions">
+      <button id="installBtn" class="ghost-btn" hidden>نصب وب‌اپ</button>
+      <button id="menuBtn" class="icon-btn" aria-label="باز کردن منو">☰</button>
+    </div>
   </header>
 
-  <main id="top">
-    <section class="hero container">
-      <div class="hero-copy reveal">
-        <span class="eyebrow"><i></i> REAL AI • ON-DEVICE • ANDROID</span>
-        <h1>مکانیک خودرو را<br><em>از داخل دوربین</em> یاد بگیر.</h1>
-        <p>Car Mechanic AR یک تجربه آموزشی فارسی برای آشنایی با قطعات خودرو است؛ دوربین را روی قطعه بگیر، نتیجه هوش مصنوعی را ببین و درباره عملکرد آن یاد بگیر.</p>
-        <div class="hero-actions">
-          <a class="btn primary" href="downloads/CarMechanicAR-RealAI.apk" download>
-            <span class="btn-icon">↓</span><span><b>دانلود نسخه Android</b><small>APK • Real AI Build</small></span>
-          </a>
-          <a class="btn ghost" href="#features">مشاهده قابلیت‌ها</a>
-        </div>
-        <div class="hero-meta">
-          <span><b>30</b> کلاس قطعه</span>
-          <span><b>Local</b> پردازش روی گوشی</span>
-          <span><b>RTL</b> رابط فارسی</span>
-        </div>
-      </div>
+  <aside id="mobileMenu" class="mobile-menu glass" aria-hidden="true">
+    <button data-route="scanner">⌖ اسکنر هوشمند</button>
+    <button data-route="learn">◫ آموزش قطعات</button>
+    <button data-route="quiz">? آزمون</button>
+    <button data-route="history">↺ تاریخچه</button>
+    <button data-route="favorites">★ علاقه‌مندی‌ها</button>
+    <button data-route="settings">⚙ تنظیمات</button>
+  </aside>
 
-      <div class="hero-visual reveal" aria-label="نمای مفهومی اپلیکیشن">
-        <div class="blueprint-card">
-          <div class="scanline"></div>
-          <div class="engine-art" aria-hidden="true">
-            <div class="engine-block"></div>
-            <div class="engine-top"></div>
-            <div class="pulley p1"></div><div class="pulley p2"></div><div class="pulley p3"></div>
-            <div class="pipe a"></div><div class="pipe b"></div>
+  <main>
+    <section id="scanner" class="page active-page">
+      <div class="scanner-layout">
+        <section class="camera-panel glass">
+          <div class="camera-toolbar">
+            <div>
+              <span class="status-dot"></span>
+              <span id="modelStatus">در حال آماده‌سازی مدل AI…</span>
+            </div>
+            <div class="toolbar-actions">
+              <button id="cameraSwitchBtn" class="small-btn">تعویض دوربین</button>
+              <button id="cameraBtn" class="primary-btn">فعال‌کردن دوربین</button>
+            </div>
           </div>
-          <div class="target t1"><span>موتور</span></div>
-          <div class="target t2"><span>رادیاتور</span></div>
-          <div class="target t3"><span>دینام</span></div>
-          <div class="hud-top"><span>AI SCAN</span><b>92%</b></div>
-          <div class="hud-bottom"><i></i><span>در حال تحلیل قطعه…</span></div>
-        </div>
-        <div class="floating-chip chip-a">ONNX Runtime</div>
-        <div class="floating-chip chip-b">Camera2</div>
+
+          <div class="camera-stage" id="cameraStage">
+            <video id="video" autoplay playsinline muted></video>
+            <canvas id="captureCanvas" width="224" height="224" hidden></canvas>
+            <div class="scanner-hud" aria-hidden="true">
+              <div class="corner c1"></div><div class="corner c2"></div><div class="corner c3"></div><div class="corner c4"></div>
+              <div class="scan-line"></div>
+              <div class="focus-label">AI FOCUS AREA</div>
+            </div>
+            <div id="cameraPlaceholder" class="camera-placeholder">
+              <div class="engine-hero" aria-hidden="true">
+                <div class="gear g1">⚙</div><div class="gear g2">⚙</div><div class="piston p1"></div><div class="piston p2"></div>
+              </div>
+              <h1>مکانیک خودرو با هوش مصنوعی</h1>
+              <p>دوربین را فعال کن و یک قطعه مکانیکی را در مرکز کادر قرار بده.</p>
+              <button id="startCameraHero" class="primary-btn big">شروع اسکن</button>
+            </div>
+            <div class="prediction-chip" id="predictionChip" hidden>
+              <span id="predictionName">—</span>
+              <strong id="predictionConfidence">0%</strong>
+            </div>
+          </div>
+
+          <div class="camera-bottom">
+            <div class="confidence-meter"><span>اطمینان مدل</span><div><i id="confidenceBar"></i></div></div>
+            <div class="live-controls">
+              <button id="pauseBtn" class="ghost-btn" disabled>توقف اسکن</button>
+              <label class="upload-btn">تحلیل عکس<input id="imageInput" type="file" accept="image/*" /></label>
+            </div>
+          </div>
+        </section>
+
+        <aside class="result-panel glass">
+          <div class="result-head">
+            <span class="eyebrow">LIVE DIAGNOSTIC VIEW</span>
+            <h2 id="resultFa">هنوز قطعه‌ای شناسایی نشده</h2>
+            <p id="resultEn">Waiting for camera input</p>
+          </div>
+          <div class="part-visual" id="partVisual">
+            <canvas id="threeCanvas"></canvas>
+            <span class="visual-caption">نمای سه‌بعدی آموزشی</span>
+          </div>
+          <p class="result-description" id="resultDescription">برای شروع، دوربین را فعال کن یا یک تصویر از قطعه بارگذاری کن.</p>
+          <div class="result-grid">
+            <div><span>وظیفه</span><strong id="resultFunction">—</strong></div>
+            <div><span>محل</span><strong id="resultLocation">—</strong></div>
+          </div>
+          <div id="safetyBox" class="safety-box" hidden><span>⚠</span><p id="safetyText"></p></div>
+          <div class="result-actions">
+            <button id="favoriteCurrentBtn" class="ghost-btn" disabled>☆ افزودن به علاقه‌مندی‌ها</button>
+            <button id="openDetailBtn" class="primary-btn" disabled>اطلاعات بیشتر</button>
+          </div>
+          <p class="ai-note">مدل فعلی Classification است؛ کادر وسط راهنمای فوکوس است و Bounding Box واقعی نیست.</p>
+        </aside>
       </div>
     </section>
 
-    <section class="strip" aria-label="فناوری‌ها">
-      <div class="strip-track">
-        <span>REAL CAMERA</span><i>◆</i><span>ON-DEVICE AI</span><i>◆</i><span>PERSIAN UI</span><i>◆</i><span>PART EDUCATION</span><i>◆</i><span>OFFLINE INFERENCE</span>
+    <section id="learn" class="page">
+      <div class="section-title"><div><span class="eyebrow">PARTS LIBRARY</span><h1>کتابخانه قطعات</h1><p>قطعات پشتیبانی‌شده توسط مدل و محتوای آموزشی را مرور کن.</p></div><input id="learnSearch" class="search-input" placeholder="جستجو بین قطعات…" /></div>
+      <div id="partsGrid" class="cards-grid"></div>
+    </section>
+
+    <section id="quiz" class="page">
+      <div class="quiz-wrap glass">
+        <div id="quizStart">
+          <span class="eyebrow">MECHANIC CHALLENGE</span><h1>آزمون شناخت قطعات</h1><p>۸ سؤال کوتاه برای سنجش شناختت از قطعات مکانیکی.</p><button id="startQuizBtn" class="primary-btn big">شروع آزمون</button>
+        </div>
+        <div id="quizGame" hidden>
+          <div class="quiz-progress"><span id="quizCounter">1/8</span><div><i id="quizProgress"></i></div><strong id="quizScore">0 امتیاز</strong></div>
+          <h2 id="quizQuestion"></h2><p id="quizHint"></p><div id="quizOptions" class="quiz-options"></div>
+        </div>
+        <div id="quizResult" hidden><span class="eyebrow">RESULT</span><h1 id="quizResultTitle">تمام شد!</h1><p id="quizResultText"></p><button id="restartQuizBtn" class="primary-btn">دوباره امتحان کن</button></div>
       </div>
     </section>
 
-    <section id="features" class="section container">
-      <div class="section-head reveal">
-        <span class="kicker">01 / قابلیت‌ها</span>
-        <h2>مثل یک مربی مکانیک<br>کنار دستت.</h2>
-        <p>تمرکز اپ فقط روی اسم قطعه نیست؛ بعد از تشخیص، اطلاعات آموزشی مرتبط هم در دسترس است.</p>
-      </div>
-      <div class="feature-grid">
-        <article class="feature-card reveal"><span class="icon">⌖</span><h3>تشخیص با دوربین</h3><p>نمای زنده دوربین با راهنمای فوکوس و نمایش نتیجه هوش مصنوعی.</p><small>CAMERA + AI</small></article>
-        <article class="feature-card reveal"><span class="icon">⚙</span><h3>اطلاعات قطعات</h3><p>نام فارسی و انگلیسی، وظیفه قطعه، محل قرارگیری و نکات ایمنی.</p><small>PART KNOWLEDGE</small></article>
-        <article class="feature-card reveal"><span class="icon">◫</span><h3>آموزش و آزمون</h3><p>فهرست آموزشی قطعات، جستجو و Quiz برای مرور آموخته‌ها.</p><small>LEARN + QUIZ</small></article>
-        <article class="feature-card reveal"><span class="icon">★</span><h3>تاریخچه و علاقه‌مندی</h3><p>قطعات دیده‌شده را نگه دار و موارد مهم را برای مراجعه بعدی ذخیره کن.</p><small>LOCAL STORAGE</small></article>
-        <article class="feature-card reveal"><span class="icon">▣</span><h3>تحلیل گالری</h3><p>ساختار تحلیل تصویر برای تصاویر انتخاب‌شده از گالری درون اپ.</p><small>IMAGE ANALYSIS</small></article>
-        <article class="feature-card reveal"><span class="icon">◇</span><h3>زیرساخت سه‌بعدی</h3><p>صفحه نمایش سه‌بعدی برای اضافه‌شدن مدل‌های نهایی قطعات خودرو آماده است.</p><small>3D READY</small></article>
-      </div>
+    <section id="history" class="page">
+      <div class="section-title"><div><span class="eyebrow">SCAN LOG</span><h1>تاریخچه شناسایی</h1><p>نتایج اسکن روی همین دستگاه ذخیره می‌شوند.</p></div><button id="clearHistoryBtn" class="ghost-btn">پاک کردن تاریخچه</button></div>
+      <div id="historyList" class="list-stack"></div>
     </section>
 
-    <section id="how" class="section dark-band">
-      <div class="container split">
-        <div class="section-head reveal">
-          <span class="kicker">02 / نحوه کار</span>
-          <h2>سه مرحله،<br>بدون پیچیدگی.</h2>
-        </div>
-        <ol class="steps reveal">
-          <li><span>01</span><div><h3>دوربین را باز کن</h3><p>اجازه دوربین را بده و قطعه موردنظر را نزدیک مرکز کادر قرار بده.</p></div></li>
-          <li><span>02</span><div><h3>AI تحلیل می‌کند</h3><p>مدل عصبی روی خود گوشی اجرا می‌شود و کلاس قطعه را همراه Confidence برمی‌گرداند.</p></div></li>
-          <li><span>03</span><div><h3>قطعه را یاد بگیر</h3><p>اطلاعات کاربردی، توضیح عملکرد و بخش‌های آموزشی را باز کن.</p></div></li>
-        </ol>
-      </div>
+    <section id="favorites" class="page">
+      <div class="section-title"><div><span class="eyebrow">YOUR GARAGE</span><h1>علاقه‌مندی‌ها</h1><p>قطعاتی که برای مرور بعدی ذخیره کرده‌ای.</p></div></div>
+      <div id="favoritesGrid" class="cards-grid"></div>
     </section>
 
-    <section id="ai" class="section container ai-section">
-      <div class="ai-panel reveal">
-        <div class="ai-copy">
-          <span class="kicker">03 / Real AI</span>
-          <h2>تشخیص ساختگی نیست.</h2>
-          <p>نسخه Android از مدل شبکه عصبی واقعی استفاده می‌کند و inference با ONNX Runtime روی خود دستگاه انجام می‌شود؛ برای نتیجه بهتر، یک قطعه پشتیبانی‌شده را نزدیک مرکز تصویر نگه دار.</p>
-          <div class="tech-pills"><span>ONNX</span><span>Android</span><span>Offline inference</span><span>30 classes</span></div>
-          <p class="notice"><b>نکته فنی:</b> مدل فعلی Classification است، نه Object Detection چندشیئی؛ بنابراین کادر فیروزه‌ای نقش راهنمای فوکوس دارد و Bounding Box پیش‌بینی‌شده توسط مدل نیست.</p>
-        </div>
-        <div class="gauge" aria-label="نمای تزئینی گیج تشخیص">
-          <div class="gauge-ring"><div class="gauge-core"><b>AI</b><span>ON DEVICE</span></div></div>
-          <div class="gauge-data"><span>Inference</span><b>LOCAL</b></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section container download-section">
-      <div class="download-card reveal">
-        <div>
-          <span class="kicker">ANDROID BUILD</span>
-          <h2>آماده‌ای موتور را<br>از نزدیک بشناسی؟</h2>
-          <p>نسخه APK را مستقیم دانلود و روی گوشی Android نصب کن.</p>
-        </div>
-        <div class="download-actions">
-          <a class="btn primary large" href="downloads/CarMechanicAR-RealAI.apk" download><span class="btn-icon">↓</span><span><b>دانلود CarMechanicAR</b><small>APK • Android 9+</small></span></a>
-          <a class="source-link" href="https://github.com/saaeiddev/Car-Mechanic-AR" target="_blank" rel="noopener">مشاهده سورس در GitHub ↗</a>
-        </div>
+    <section id="settings" class="page">
+      <div class="settings-grid">
+        <div class="settings-card glass"><span class="eyebrow">AI SETTINGS</span><h2>تنظیمات تشخیص</h2><label>حداقل اطمینان <strong id="thresholdValue">55%</strong><input id="thresholdRange" type="range" min="20" max="90" step="5" value="55" /></label><label>سرعت اسکن <select id="scanSpeed"><option value="450">سریع</option><option value="700" selected>متعادل</option><option value="1100">کم‌مصرف</option></select></label></div>
+        <div class="settings-card glass"><span class="eyebrow">CAMERA</span><h2>دوربین و تجربه کاربری</h2><label class="toggle-row"><span>بازخورد لرزشی</span><input id="hapticToggle" type="checkbox" checked /></label><label class="toggle-row"><span>ذخیره تاریخچه</span><input id="historyToggle" type="checkbox" checked /></label><button id="installSettingsBtn" class="primary-btn">نصب به‌صورت PWA</button></div>
+        <div class="settings-card glass"><span class="eyebrow">PRIVACY</span><h2>حریم خصوصی</h2><p>پردازش مدل روی مرورگر انجام می‌شود. تصاویر دوربین برای شناسایی به سرور ما ارسال نمی‌شوند.</p><p class="muted">برای دسترسی به دوربین، سایت باید روی HTTPS اجرا شود؛ GitHub Pages این شرط را فراهم می‌کند.</p></div>
       </div>
     </section>
   </main>
 
-  <footer>
-    <div class="container footer-inner"><div class="brand"><span class="brand-mark"><span class="gear-dot"></span></span><span><strong>Car Mechanic AR</strong><small>Learn the machine.</small></span></div><p>یک پروژه آموزشی برای شناخت بهتر خودرو. جایگزین تعمیرکار حرفه‌ای نیست.</p><span class="copyright">© <span id="year"></span></span></div>
-  </footer>
-  <script src="app.js"></script>
+  <nav class="bottom-nav glass" aria-label="ناوبری موبایل">
+    <button data-route="scanner" class="active"><span>⌖</span>اسکنر</button>
+    <button data-route="learn"><span>◫</span>آموزش</button>
+    <button data-route="quiz"><span>?</span>آزمون</button>
+    <button data-route="history"><span>↺</span>تاریخچه</button>
+    <button data-route="favorites"><span>★</span>ذخیره‌ها</button>
+  </nav>
+
+  <dialog id="detailDialog" class="detail-dialog">
+    <button id="closeDialogBtn" class="dialog-close" aria-label="بستن">×</button>
+    <div id="detailContent"></div>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.22.0/dist/ort.min.js"></script>
+  <script type="module" src="app.js"></script>
 </body>
 </html>
