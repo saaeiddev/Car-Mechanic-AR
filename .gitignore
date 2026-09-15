@@ -1,0 +1,16 @@
+# macOS / Xcode
+.DS_Store
+DerivedData/
+*.xcuserstate
+xcuserdata/
+*.ipa
+
+# Android / Gradle
+.gradle/
+**/build/
+local.properties
+*.apk
+*.aab
+
+# Generated Xcode project (generated from ios/project.yml)
+ios/CarMechanicAR.xcodeproj/
