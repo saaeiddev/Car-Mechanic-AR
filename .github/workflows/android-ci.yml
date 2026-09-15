@@ -22,7 +22,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-          cache: pip
       - name: Install model export tools
         run: python -m pip install --upgrade pip && pip install "ultralytics>=8.3,<9" "huggingface_hub>=0.28" "onnx>=1.17,<2"
       - name: Download and export real AI model
