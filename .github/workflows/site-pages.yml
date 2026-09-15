@@ -29,16 +29,44 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
       - name: Install model export tools
         run: python -m pip install --upgrade pip && pip install "ultralytics>=8.3,<9" "huggingface_hub>=0.28" "onnx>=1.17,<2"
       - name: Prepare browser AI model
         run: python scripts/prepare_web_ai_model.py
+      - name: Vendor browser runtimes locally
+        run: |
+          rm -rf /tmp/carmech-webdeps
+          mkdir -p /tmp/carmech-webdeps site/vendor/ort site/vendor/three
+          npm install --prefix /tmp/carmech-webdeps --no-package-lock --no-save onnxruntime-web@1.22.0 three@0.180.0
+          cp /tmp/carmech-webdeps/node_modules/onnxruntime-web/dist/ort.min.js site/vendor/ort/ort.min.js
+          cp /tmp/carmech-webdeps/node_modules/onnxruntime-web/dist/ort-wasm* site/vendor/ort/
+          cp /tmp/carmech-webdeps/node_modules/three/build/three.module.js site/vendor/three/three.module.js
       - name: Verify web app model
         run: |
           test -s site/models/car_parts_classifier.onnx
           test -s site/models/car_part_labels.txt
           ls -lh site/models/car_parts_classifier.onnx
           wc -l site/models/car_part_labels.txt
+          test -s site/vendor/ort/ort.min.js
+          test -n "$(find site/vendor/ort -maxdepth 1 -name '*.wasm' -print -quit)"
+          test -s site/vendor/three/three.module.js
+      - name: Smoke-test model with ONNX Runtime Web
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const ort = require('/tmp/carmech-webdeps/node_modules/onnxruntime-web');
+          ort.env.wasm.numThreads = 1;
+          (async () => {
+            const bytes = fs.readFileSync('site/models/car_parts_classifier.onnx');
+            const session = await ort.InferenceSession.create(bytes, {executionProviders:['wasm']});
+            console.log('Model inputs:', session.inputNames);
+            console.log('Model outputs:', session.outputNames);
+          })().catch(err => { console.error(err); process.exit(1); });
+          NODE
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload Pages artifact
