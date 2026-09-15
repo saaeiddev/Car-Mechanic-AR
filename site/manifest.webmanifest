@@ -1,0 +1,10 @@
+{
+  "name": "Car Mechanic AR",
+  "short_name": "Mechanic AR",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#070b0f",
+  "theme_color": "#070b0f",
+  "lang": "fa",
+  "dir": "rtl"
+}

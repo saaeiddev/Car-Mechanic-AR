@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://saaeiddev.github.io/Car-Mechanic-AR/
