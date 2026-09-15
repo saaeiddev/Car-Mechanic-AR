@@ -8,7 +8,6 @@
   <title>Car Mechanic AR — Web App</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -164,7 +163,16 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.22.0/dist/ort.min.js"></script>
-  <script type="module" src="app.js"></script>
+  <script src="vendor/ort/ort.min.js?v=3"></script>
+  <script>
+    // Mobile-safe ONNX Runtime settings. GitHub Pages is not cross-origin
+    // isolated, so multi-thread WASM must stay disabled.
+    if (window.ort) {
+      ort.env.wasm.numThreads = 1;
+      ort.env.wasm.proxy = false;
+      ort.env.wasm.wasmPaths = new URL('vendor/ort/', document.baseURI).href;
+    }
+  </script>
+  <script type="module" src="app.js?v=3"></script>
 </body>
 </html>
