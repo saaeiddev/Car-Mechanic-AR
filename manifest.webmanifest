@@ -1,0 +1,13 @@
+{
+  "name":"Car Mechanic AR Web App",
+  "short_name":"Mechanic AR",
+  "lang":"fa",
+  "dir":"rtl",
+  "start_url":"./#scanner",
+  "scope":"./",
+  "display":"standalone",
+  "background_color":"#071015",
+  "theme_color":"#081014",
+  "description":"وب اپ آموزش و شناسایی قطعات مکانیکی با هوش مصنوعی",
+  "icons":[{"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}

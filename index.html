@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#081014" />
+  <meta name="description" content="Car Mechanic AR Web App — شناسایی و آموزش قطعات خودرو با دوربین و هوش مصنوعی روی مرورگر" />
+  <title>Car Mechanic AR — Web App</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div>
+  <header class="topbar glass">
+    <a class="brand" href="#scanner" aria-label="Car Mechanic AR">
+      <span class="brand-mark">⚙</span>
+      <span><strong>CAR MECHANIC AR</strong><small>WEB APP • REAL AI</small></span>
+    </a>
+    <nav class="desktop-nav" aria-label="ناوبری اصلی">
+      <button data-route="scanner">اسکنر</button>
+      <button data-route="learn">آموزش</button>
+      <button data-route="quiz">آزمون</button>
+      <button data-route="history">تاریخچه</button>
+      <button data-route="favorites">علاقه‌مندی‌ها</button>
+      <button data-route="settings">تنظیمات</button>
+    </nav>
+    <div class="top-actions">
+      <button id="installBtn" class="ghost-btn" hidden>نصب وب‌اپ</button>
+      <button id="menuBtn" class="icon-btn" aria-label="باز کردن منو">☰</button>
+    </div>
+  </header>
+
+  <aside id="mobileMenu" class="mobile-menu glass" aria-hidden="true">
+    <button data-route="scanner">⌖ اسکنر هوشمند</button>
+    <button data-route="learn">◫ آموزش قطعات</button>
+    <button data-route="quiz">? آزمون</button>
+    <button data-route="history">↺ تاریخچه</button>
+    <button data-route="favorites">★ علاقه‌مندی‌ها</button>
+    <button data-route="settings">⚙ تنظیمات</button>
+  </aside>
+
+  <main>
+    <section id="scanner" class="page active-page">
+      <div class="scanner-layout">
+        <section class="camera-panel glass">
+          <div class="camera-toolbar">
+            <div>
+              <span class="status-dot"></span>
+              <span id="modelStatus">در حال آماده‌سازی مدل AI…</span>
+            </div>
+            <div class="toolbar-actions">
+              <button id="cameraSwitchBtn" class="small-btn">تعویض دوربین</button>
+              <button id="cameraBtn" class="primary-btn">فعال‌کردن دوربین</button>
+            </div>
+          </div>
+
+          <div class="camera-stage" id="cameraStage">
+            <video id="video" autoplay playsinline muted></video>
+            <canvas id="captureCanvas" width="224" height="224" hidden></canvas>
+            <div class="scanner-hud" aria-hidden="true">
+              <div class="corner c1"></div><div class="corner c2"></div><div class="corner c3"></div><div class="corner c4"></div>
+              <div class="scan-line"></div>
+              <div class="focus-label">AI FOCUS AREA</div>
+            </div>
+            <div id="cameraPlaceholder" class="camera-placeholder">
+              <div class="engine-hero" aria-hidden="true">
+                <div class="gear g1">⚙</div><div class="gear g2">⚙</div><div class="piston p1"></div><div class="piston p2"></div>
+              </div>
+              <h1>مکانیک خودرو با هوش مصنوعی</h1>
+              <p>دوربین را فعال کن و یک قطعه مکانیکی را در مرکز کادر قرار بده.</p>
+              <button id="startCameraHero" class="primary-btn big">شروع اسکن</button>
+            </div>
+            <div class="prediction-chip" id="predictionChip" hidden>
+              <span id="predictionName">—</span>
+              <strong id="predictionConfidence">0%</strong>
+            </div>
+          </div>
+
+          <div class="camera-bottom">
+            <div class="confidence-meter"><span>اطمینان مدل</span><div><i id="confidenceBar"></i></div></div>
+            <div class="live-controls">
+              <button id="pauseBtn" class="ghost-btn" disabled>توقف اسکن</button>
+              <label class="upload-btn">تحلیل عکس<input id="imageInput" type="file" accept="image/*" /></label>
+            </div>
+          </div>
+        </section>
+
+        <aside class="result-panel glass">
+          <div class="result-head">
+            <span class="eyebrow">LIVE DIAGNOSTIC VIEW</span>
+            <h2 id="resultFa">هنوز قطعه‌ای شناسایی نشده</h2>
+            <p id="resultEn">Waiting for camera input</p>
+          </div>
+          <div class="part-visual" id="partVisual">
+            <canvas id="threeCanvas"></canvas>
+            <span class="visual-caption">نمای سه‌بعدی آموزشی</span>
+          </div>
+          <p class="result-description" id="resultDescription">برای شروع، دوربین را فعال کن یا یک تصویر از قطعه بارگذاری کن.</p>
+          <div class="result-grid">
+            <div><span>وظیفه</span><strong id="resultFunction">—</strong></div>
+            <div><span>محل</span><strong id="resultLocation">—</strong></div>
+          </div>
+          <div id="safetyBox" class="safety-box" hidden><span>⚠</span><p id="safetyText"></p></div>
+          <div class="result-actions">
+            <button id="favoriteCurrentBtn" class="ghost-btn" disabled>☆ افزودن به علاقه‌مندی‌ها</button>
+            <button id="openDetailBtn" class="primary-btn" disabled>اطلاعات بیشتر</button>
+          </div>
+          <p class="ai-note">مدل فعلی Classification است؛ کادر وسط راهنمای فوکوس است و Bounding Box واقعی نیست.</p>
+        </aside>
+      </div>
+    </section>
+
+    <section id="learn" class="page">
+      <div class="section-title"><div><span class="eyebrow">PARTS LIBRARY</span><h1>کتابخانه قطعات</h1><p>قطعات پشتیبانی‌شده توسط مدل و محتوای آموزشی را مرور کن.</p></div><input id="learnSearch" class="search-input" placeholder="جستجو بین قطعات…" /></div>
+      <div id="partsGrid" class="cards-grid"></div>
+    </section>
+
+    <section id="quiz" class="page">
+      <div class="quiz-wrap glass">
+        <div id="quizStart">
+          <span class="eyebrow">MECHANIC CHALLENGE</span><h1>آزمون شناخت قطعات</h1><p>۸ سؤال کوتاه برای سنجش شناختت از قطعات مکانیکی.</p><button id="startQuizBtn" class="primary-btn big">شروع آزمون</button>
+        </div>
+        <div id="quizGame" hidden>
+          <div class="quiz-progress"><span id="quizCounter">1/8</span><div><i id="quizProgress"></i></div><strong id="quizScore">0 امتیاز</strong></div>
+          <h2 id="quizQuestion"></h2><p id="quizHint"></p><div id="quizOptions" class="quiz-options"></div>
+        </div>
+        <div id="quizResult" hidden><span class="eyebrow">RESULT</span><h1 id="quizResultTitle">تمام شد!</h1><p id="quizResultText"></p><button id="restartQuizBtn" class="primary-btn">دوباره امتحان کن</button></div>
+      </div>
+    </section>
+
+    <section id="history" class="page">
+      <div class="section-title"><div><span class="eyebrow">SCAN LOG</span><h1>تاریخچه شناسایی</h1><p>نتایج اسکن روی همین دستگاه ذخیره می‌شوند.</p></div><button id="clearHistoryBtn" class="ghost-btn">پاک کردن تاریخچه</button></div>
+      <div id="historyList" class="list-stack"></div>
+    </section>
+
+    <section id="favorites" class="page">
+      <div class="section-title"><div><span class="eyebrow">YOUR GARAGE</span><h1>علاقه‌مندی‌ها</h1><p>قطعاتی که برای مرور بعدی ذخیره کرده‌ای.</p></div></div>
+      <div id="favoritesGrid" class="cards-grid"></div>
+    </section>
+
+    <section id="settings" class="page">
+      <div class="settings-grid">
+        <div class="settings-card glass"><span class="eyebrow">AI SETTINGS</span><h2>تنظیمات تشخیص</h2><label>حداقل اطمینان <strong id="thresholdValue">55%</strong><input id="thresholdRange" type="range" min="20" max="90" step="5" value="55" /></label><label>سرعت اسکن <select id="scanSpeed"><option value="450">سریع</option><option value="700" selected>متعادل</option><option value="1100">کم‌مصرف</option></select></label></div>
+        <div class="settings-card glass"><span class="eyebrow">CAMERA</span><h2>دوربین و تجربه کاربری</h2><label class="toggle-row"><span>بازخورد لرزشی</span><input id="hapticToggle" type="checkbox" checked /></label><label class="toggle-row"><span>ذخیره تاریخچه</span><input id="historyToggle" type="checkbox" checked /></label><button id="installSettingsBtn" class="primary-btn">نصب به‌صورت PWA</button></div>
+        <div class="settings-card glass"><span class="eyebrow">PRIVACY</span><h2>حریم خصوصی</h2><p>پردازش مدل روی مرورگر انجام می‌شود. تصاویر دوربین برای شناسایی به سرور ما ارسال نمی‌شوند.</p><p class="muted">برای دسترسی به دوربین، سایت باید روی HTTPS اجرا شود؛ GitHub Pages این شرط را فراهم می‌کند.</p></div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav glass" aria-label="ناوبری موبایل">
+    <button data-route="scanner" class="active"><span>⌖</span>اسکنر</button>
+    <button data-route="learn"><span>◫</span>آموزش</button>
+    <button data-route="quiz"><span>?</span>آزمون</button>
+    <button data-route="history"><span>↺</span>تاریخچه</button>
+    <button data-route="favorites"><span>★</span>ذخیره‌ها</button>
+  </nav>
+
+  <dialog id="detailDialog" class="detail-dialog">
+    <button id="closeDialogBtn" class="dialog-close" aria-label="بستن">×</button>
+    <div id="detailContent"></div>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.22.0/dist/ort.min.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
