@@ -33,6 +33,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Validate scanner camera patch
+        run: |
+          test -s site/camera-patch.js
+          node --check site/camera-patch.js
+          grep -q "getUserMedia" site/camera-patch.js
       - name: Install model export tools
         run: python -m pip install --upgrade pip && pip install "ultralytics>=8.3,<9" "huggingface_hub>=0.28" "onnx>=1.17,<2"
       - name: Prepare browser AI model
