@@ -1,68 +1,45 @@
 # Car Mechanic AR — مکانیک با واقعیت افزوده
 
-A bilingual-source, Persian-first automotive education app with a real camera pipeline, AR overlays, modular part recognition, 3D viewing infrastructure, lessons, quiz, history, favorites and settings.
+Persian-first automotive education app with a real camera pipeline, on-device AI recognition, AR-style overlays, part details, gallery analysis, lessons, quiz, history, favorites, settings and 3D-viewer infrastructure.
 
-## What is real vs demo
+## Android Real-AI build
 
-- **iOS:** real ARKit + RealityKit camera/session infrastructure, spatial anchors, Vision/Core ML adapter, SwiftUI UI.
-- **Android:** real Camera2 preview + overlay/tracking UI with a swappable detector abstraction.
-- A production automotive object detector is **not bundled**. Both clients ship with an explicit `DemoCarPartDetector` so the app is testable now, while `CoreMLCarPartDetector` / Android detector adapters are isolated for replacement with a trained automotive model.
-- 3D viewer infrastructure is included. Place licensed USDZ/GLB assets in the documented resource folders.
+The Android app now includes a **real neural-network model** executed locally on the phone with ONNX Runtime. GitHub Actions downloads the licensed upstream weights, exports them to ONNX, validates the model and packages it into the APK before compiling the app.
 
-## Repository layout
+Current model source: `AswinG5/moto-parts-30cls` (MIT). It supports 30 motorcycle/mechanical-part classes including cylinder head, alternator, clutch plate, piston, crankshaft, camshaft, spark plug, radiator, shock absorber, gearbox, brake disc, brake pad, battery terminal, fuse box, carburetor and fuel tank.
 
-- `ios/` native Swift / SwiftUI / ARKit / RealityKit / Vision / Core ML / SwiftData project source
-- `android/` native Android project source
-- `docs/` model integration notes and safety notes
+### Important model limitation
 
-## iOS requirements
+The bundled network is an **image classifier**, not a multi-object object detector. Keep one supported mechanical part near the center of the camera. The predicted class and confidence are genuine neural-network outputs. The cyan focus rectangle is a UI guide; it is **not** a model-predicted bounding box. A future true automotive detector can replace the inference service without changing the app screens.
 
-- macOS + current Xcode
-- iPhone with ARKit support
-- iOS deployment target 17+ (use the latest installed SDK; the project is intentionally not hard-bound to a marketing OS number)
-- XcodeGen is optional but recommended to generate the `.xcodeproj` from `ios/project.yml`
+The app does not silently fall back to fake/demo recognition if the production model is unavailable.
 
-### iOS run
+## Reproducible Android build
 
-```bash
-cd ios
-xcodegen generate
-open CarMechanicAR.xcodeproj
-```
+Push to `main` or manually run the `Android Real AI APK` GitHub Actions workflow. It will:
 
-Set your development team, connect an iPhone, then Run.
+1. Download the published model weights.
+2. Export and validate `car_parts_classifier.onnx`.
+3. Package the ONNX model and class labels inside the APK.
+4. Build with JDK 17 / Gradle 8.9 / targetSdk 35.
+5. Upload `CarMechanicAR-RealAI.apk` as a workflow artifact.
 
-### Core ML integration
+Local development requirements:
 
-1. Train/export an object detection model whose labels map to `CarPart.id`.
-2. Add `CarPartDetector.mlmodel` to the iOS target.
-3. Switch `DetectionMode.demo` to `.production` in Settings or App configuration.
-4. `CoreMLCarPartDetector` loads the model dynamically and returns Vision bounding boxes.
-
-### USDZ models
-
-Place licensed models in `ios/CarMechanicAR/Resources/Models/` using names such as:
-
-- `engine.usdz`
-- `battery.usdz`
-- `spark_plug.usdz`
-- `alternator.usdz`
-
-The 3D viewer falls back to a generated placeholder mesh if a file is absent.
-
-## Android requirements
-
-- Android Studio / current Android SDK
+- Android Studio / Android SDK 35
+- JDK 17
 - minSdk 28
-- targetSdk 35
 
-```bash
-cd android
-./gradlew assembleDebug
-```
+The exact model build pipeline is in `scripts/prepare_real_ai_model.py`, and model details are documented in `docs/REAL_AI_MODEL.md`.
 
-The detector interface is under `ai/CarPartDetectionService.kt`; replace `DemoCarPartDetector` with a TensorFlow Lite / MediaPipe / custom on-device detector when the model is available.
+## iOS
+
+The repository also contains the SwiftUI / ARKit / RealityKit / Vision/Core ML iOS architecture. The current real ONNX Android model integration is Android-specific; the iOS target still uses its separate Core ML adapter/demo configuration until an equivalent production Core ML model is bundled.
+
+## 3D assets
+
+3D viewer infrastructure is present, but final licensed vehicle-part 3D assets are not bundled yet. Placeholder/viewer screens are clearly identified in the UI.
 
 ## Safety
 
-This app is educational. It does not replace a qualified mechanic. Never touch hot, pressurized, high-voltage or moving components. Turn the vehicle off before inspection where appropriate.
+This app is educational and does not replace a qualified mechanic. Never touch hot, pressurized, high-voltage or moving components. Turn the vehicle off before inspection where appropriate.
