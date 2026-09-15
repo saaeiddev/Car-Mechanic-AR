@@ -163,16 +163,15 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script src="vendor/ort/ort.min.js?v=3"></script>
+  <script src="vendor/ort/ort.min.js?v=6"></script>
   <script>
-    // Mobile-safe ONNX Runtime settings. GitHub Pages is not cross-origin
-    // isolated, so multi-thread WASM must stay disabled.
     if (window.ort) {
       ort.env.wasm.numThreads = 1;
       ort.env.wasm.proxy = false;
       ort.env.wasm.wasmPaths = new URL('vendor/ort/', document.baseURI).href;
     }
   </script>
-  <script type="module" src="app.js?v=3"></script>
+  <script src="camera-patch.js?v=6"></script>
+  <script type="module" src="app.js?v=6"></script>
 </body>
 </html>
